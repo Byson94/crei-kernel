@@ -1,24 +1,7 @@
 #include "io.h"
 
-unsigned int cursor_position = 0;
-
-void print_string(char *string_ptr) {
-    char *str = string_ptr;
-    
-    volatile char *video_memory = (volatile char*) 0xB8000;
-    
-    int i = 0;
-    while (str[i] != '\0') {
-        video_memory[cursor_position * 2] = str[i];
-        video_memory[cursor_position * 2 + 1] = 0x0F;
-        
-        cursor_position++;
-        i++;
-    }
-}
-
 int main() {
-    print_string("Hello from Crei!");
+    print_string("Hello from Crei!\n");
     cursor_position++;
 
     while(1) {
@@ -33,10 +16,7 @@ int main() {
                 
                 while (global_ibm_array[i].scancode != 0x0) {
                     if (global_ibm_array[i].scancode == scancode) {
-                        video_memory[cursor_position * 2] = global_ibm_array[i].ascii;
-                        video_memory[cursor_position * 2 + 1] = 0x02; 
-                        
-                        cursor_position++;
+                        print_string((char*)global_ibm_array[i].ascii);
                         break;
                     }
                     i++;

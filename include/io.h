@@ -1,11 +1,14 @@
 #pragma once
 
+extern unsigned int cursor_position;
+
 unsigned char inb(unsigned short port);
 void outb(unsigned short port, unsigned char data);
+void print_string(char *str);
 
 typedef struct {
     unsigned char scancode;
-    char ascii;
+    const char *ascii;
 } IBMPair;
 
 extern IBMPair global_ibm_array[];
