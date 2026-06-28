@@ -2,7 +2,8 @@
 
 int main() {
     print_string("Hello from Crei!\n");
-    cursor_position++;
+    print_string("$ ");
+    line_start_position = cursor_position;
 
     while(1) {
         unsigned char status = inb(0x64);
@@ -17,6 +18,10 @@ int main() {
                 while (global_ibm_array[i].scancode != 0x0) {
                     if (global_ibm_array[i].scancode == scancode) {
                         print_string((char*)global_ibm_array[i].ascii);
+                        if (global_ibm_array[i].ascii[0] == '\n') {
+                            print_string("$ ");
+                            line_start_position = cursor_position;
+                        }
                         break;
                     }
                     i++;

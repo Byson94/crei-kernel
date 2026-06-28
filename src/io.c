@@ -2,6 +2,7 @@
 #include "hardware.h"
 
 unsigned int cursor_position = 0;
+unsigned int line_start_position = 0;
 
 unsigned char inb(unsigned short port) {
     unsigned char result;
@@ -41,8 +42,11 @@ void print_string(char *string_ptr) {
         if (str[i] == '\n') {
             cursor_position += (80 - (cursor_position % 80));
         } else if (str[i] == '\b') {
-            cursor_position--;
-            video_memory[cursor_position * 2] = ' ';
+            if (cursor_position > line_start_position) {
+                cursor_position--;
+                video_memory[cursor_position * 2] = ' ';
+                video_memory[cursor_position * 2 + 1] = 0x0F;
+            }
         } else if (str[i] == '\t') {
             cursor_position += (4 - (cursor_position % 4));
         } else {

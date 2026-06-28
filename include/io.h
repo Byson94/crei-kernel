@@ -1,6 +1,7 @@
 #pragma once
 
 extern unsigned int cursor_position;
+extern unsigned int line_start_position;
 
 unsigned char inb(unsigned short port);
 void outb(unsigned short port, unsigned char data);
