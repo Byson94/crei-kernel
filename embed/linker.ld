@@ -1,9 +1,11 @@
-ENTRY(main)
-SECTIONS
+ENTRY(_start) SECTIONS
 {
-    . = 1M;
-    .text : { *(.text) }
+    . = 1M;   
+    .text : { 
+        *(.multiboot)
+        *(.text) 
+        *(.rodata)
+    }
     .data : { *(.data) }
-    .bss : { *(.bss) }
+    .bss  : { *(.bss)  }
 }
-
