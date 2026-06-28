@@ -1,7 +1,7 @@
 CC = gcc
-FLAGS = -ffreestanding -nostdlib -m32 -c
+FLAGS = -ffreestanding -nostdlib -m32 -Iinclude -r
 
-target: src/*
+target: src/* include/*
 	# Compiling.
 	mkdir -p build
 	$(CC) $(FLAGS) src/* -o build/crei.o

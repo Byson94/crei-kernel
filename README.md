@@ -13,3 +13,7 @@ Just run the `crei.iso` file in `build/` with this command:
 ```bash
 $ qemu-system-x86_64 -cdrom build/crei.iso -m 256M
 ```
+
+## Notice
+
+The assembly and linker code is AI generated, the C code is human generated.
