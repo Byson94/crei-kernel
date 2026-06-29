@@ -1,6 +1,7 @@
 # Crei Kernel
 
 A minimal kernel written in C. Nothing big, not the next linux, just a simple educational project.
+Mainly built for and tested on `qemu` virtual machine.
 
 ## Compiling
 
