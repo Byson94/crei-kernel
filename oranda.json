@@ -1,0 +1,16 @@
+{
+  "components": {
+    "artifacts": false,
+    "changelog": false
+  },
+  "build": {
+    "path_prefix": "crei-kernel"
+  },
+  "project": {
+    "repository": "https://github.com/byson94/crei-kernel"
+  },
+  "styles": {
+    "theme": "axodark"
+  }
+}
+
