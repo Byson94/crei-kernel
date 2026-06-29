@@ -1,11 +1,13 @@
 #include "io.h"
 #include "shell.h"
 #include "utils.h"
+#include "panic.h"
 #include "hardware.h"
 
-static const char* helps[3][2] = {
+static const char* helps[4][2] = {
     { "clear", "Clear Buffer" },
-    { "shutdown", "Attempt to shutdown this device." },
+    { "shutdown", "Attempt to shutdown this device" },
+    { "kmsg", "Send a message to the kernel" },
     { "help", "Print this help" }
 };
 
@@ -83,22 +85,34 @@ void shell_shutdown() {
     }
 }
 
-// == Shell VFS ==
-void shell_ls() {
-    // empty for now
-}
-
-void handle_command(char* cmd) {
-    if (strcmp(cmd, "help") == 0) {
+void handle_command(int argc, char** argv) {
+    if (strcmp(argv[0], "help") == 0) {
         shell_help();
-    } else if (strcmp(cmd, "clear") == 0) {
+    } else if (strcmp(argv[0], "clear") == 0) {
         shell_clear();
-    } else if (strcmp(cmd, "shutdown") == 0) {
+    } else if (strcmp(argv[0], "shutdown") == 0) {
         shell_shutdown();
+    } else if (strcmp(argv[0], "kmsg") == 0) {
+        if (argc < 2) {
+            print_string("Pass a message to evaluate.\n");
+            return;   
+        }
+
+        if (strcmp(argv[1], "k22halt") == 0) {
+            print_string("Halting under user request...\n");
+            print_string("You can press the physical power button to shutdown.\n");
+            __asm__ __volatile__("cli; hlt");
+        } else if (strcmp(argv[1], "k22panic") == 0) {
+            PANIC("User requested panic!");
+        } else {
+            print_string("Unknown message:");
+            print_string(argv[1]);
+            print_string("\n");
+        }
     } else {
-        print_string("Command not found: '");
-        print_string(cmd);
-        print_string("'\n");
+        print_string("Command not found: ");
+        print_string(argv[0]);
+        print_string("\n");
     }
 }
 
@@ -135,7 +149,9 @@ void run_shell() {
                         }
                         cmd[i] = '\0';
 
-                        handle_command(cmd);
+                        char* argv[81];
+                        size_t count = split_whitespace_inplace(cmd, 81, argv);
+                        handle_command(count, argv);
                 
                         // setep shell
                         print_string("$ ");
