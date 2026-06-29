@@ -28,6 +28,7 @@ $(BUILD)/boot.o: embed/boot.asm
 $(BUILD)/crei-kernel: $(BUILD)/boot.o $(OBJS)
 	$(LD) $(LDFLAGS) $(BUILD)/boot.o $(OBJS) -o $@
 
+# Building
 iso: $(BUILD)/crei-kernel
 	@mkdir -p $(BUILD)/iso_root/boot/grub
 	cp $(BUILD)/crei-kernel build/iso_root/boot/
