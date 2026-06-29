@@ -14,7 +14,7 @@ OBJS = $(patsubst src/%.c, $(BUILD)/kernel/%.o, $(SRCS))
 
 all: iso 
 
-# Compiling.
+# Compiling
 $(BUILD)/kernel/%.o: src/%.c 
 	@mkdir -p $(BUILD)/kernel
 	$(CC) $(CFLAGS) -c $< -o $@
