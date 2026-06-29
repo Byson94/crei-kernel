@@ -1,5 +1,13 @@
 # Input/Output
 
+## Video Buffer
+
+- 80 colums
+- 25 rows
+- Is at address `0xB8000`
+
+## Reading Keypress
+
 - `0x64` tells you if a key event happened.
 - `0x60` tells you what key was pressed.
 

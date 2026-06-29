@@ -33,8 +33,7 @@ IBMPair global_ibm_array[] = {
     {0x0, 0}
 };
 
-void print_string(char *string_ptr) {
-    char *str = string_ptr;
+void print_string(const char *str) {
     volatile char *video_memory = (volatile char*) 0xB8000;
     
     int i = 0;
@@ -60,11 +59,3 @@ void print_string(char *string_ptr) {
     update_hardware_cursor(cursor_position);
 }
 
-int io_strcmp(const char *str1, const char *str2) {
-    while (*str1 && (*str1 == *str2)) {
-        str1++;
-        str2++;
-    }
-
-    return *(const unsigned char*)str1 - *(const unsigned char*)str2;
-}

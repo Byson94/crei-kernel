@@ -1,10 +1,82 @@
 #include "io.h"
 #include "shell.h"
+#include "utils.h"
 #include "hardware.h"
 
+static const char* helps[3][2] = {
+    { "clear", "Clear Buffer" },
+    { "shutdown", "Attempt to shutdown this device." },
+    { "help", "Print this help" }
+};
+
+void print_padded_string(const char *str, unsigned int width) {
+    print_string(str);
+    
+    unsigned int len = string_length(str);
+    if (len < width) {
+        unsigned int spaces_to_print = width - len;
+        for (unsigned int i = 0; i < spaces_to_print; i++) {
+            print_string(" ");
+        }
+    }
+}
+
 void handle_command(char* cmd) {
-    if (io_strcmp(cmd, "help") == 0) {
-        print_string("Help will arrive in two business days.\n");
+    if (strcmp(cmd, "help") == 0) {
+        int help_size = sizeof(helps)/sizeof(helps[0]);
+
+        // Find longest command
+        unsigned int max_cmd_len = 0;
+        for (int i = 0; i < help_size; i++) {
+            unsigned int current_len = string_length(helps[i][0]);
+            if (current_len > max_cmd_len) {
+                max_cmd_len = current_len;
+            }
+        }
+
+        unsigned int dynamic_width = max_cmd_len + 2;
+
+        print_string("Kesh - Kernel Embeded SHell\n\n");
+        print_string("Basic Commands: \n");
+
+        for (int i = 0; i < help_size; i++) {
+            print_string("  ");
+            print_padded_string(helps[i][0], dynamic_width);
+            print_string(" - ");
+            print_string(helps[i][1]);
+            print_string("\n");
+        }
+    } else if (strcmp(cmd, "clear") == 0) {
+        volatile char *video_memory = (volatile char*) 0xB8000;
+
+        for (unsigned int i = 0; i <= cursor_position; i++) {
+            video_memory[i * 2] = ' ';
+            video_memory[i * 2 + 1] = 0x0F;
+        }
+
+        cursor_position = 0;
+        line_start_position = 0;
+    } else if (strcmp(cmd, "shutdown") == 0) {
+        __asm__ __volatile__("outw %1, %0" : : "dN"((unsigned short)0x604), "a"((unsigned short)0x2000));
+        __asm__ __volatile__("outw %1, %0" : : "dN"((unsigned short)0xB004), "a"((unsigned short)0x2000));
+        __asm__ __volatile__("outl %1, %0" : : "dN"((unsigned short)0x4004), "a"((unsigned int)0x3400));
+
+        print_string("Emulator bypass failed. Attempting APM hardware power-off...\n");
+
+        __asm__ __volatile__ (
+            "mov $0x5307, %%ax\n\t"
+            "mov $0x0001, %%bx\n\t"
+            "mov $0x0003, %%cx\n\t"
+            "int $0x15"
+            : : : "ax", "bx", "cx"
+        );
+
+        print_string("\nShutdown failed. ACPI support required for this motherboard.\n");
+        print_string("You can now safely press the physical power button.\n");
+
+        while (1) {
+            __asm__ __volatile__("cli; hlt");
+        }
     } else {
         print_string("Command not found: '");
         print_string(cmd);
