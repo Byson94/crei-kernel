@@ -6,6 +6,6 @@ section .multiboot
 
 section .text
 global _start
-extern main
+extern start_kernel
 _start:
-    jmp main        ; Execute main function
+    jmp start_kernel

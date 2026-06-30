@@ -4,6 +4,10 @@ You will be dropped into a black box called a "console". You can type things in 
 that evaluates the thing you type is a "shell". The shell built into Crei is called "kesh". 
 You can see it in action by typing `help` into the console.
 
+## Command: `echo`
+
+The classic echo command. Echo's something to the console.
+
 ## Command: `clear`
 
 Clear the console buffer. This command takes no arguments. Just run it as-is.

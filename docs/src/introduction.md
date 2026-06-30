@@ -1,9 +1,7 @@
 # Crei Kernel
 
-Crei is a simple kernel forged purely out of boredom. It is created more as an educational tool
-to learn more about C and systems programming. I work on crei until I believe its good enough
-for an educational tool. That point may come once the kernel is capable enough for 
-compiling and executing C programs.
+Crei is a simple kernel forged purely out of boredom. It is created as an educational tool
+to learn more about C and systems programming. 
 
 ## Compiling & Execution
 

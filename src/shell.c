@@ -4,7 +4,8 @@
 #include "panic.h"
 #include "hardware.h"
 
-static const char* helps[4][2] = {
+static const char* helps[5][2] = {
+    { "echo", "Echo something" },
     { "clear", "Clear Buffer" },
     { "shutdown", "Attempt to shutdown this device" },
     { "kmsg", "Send a message to the kernel" },
@@ -88,6 +89,12 @@ void shell_shutdown() {
 void handle_command(int argc, char** argv) {
     if (strcmp(argv[0], "help") == 0) {
         shell_help();
+    } else if (strcmp(argv[0], "echo") == 0) {
+        for (int i = 1; i <= argc - 1; i++) {
+            print_string(argv[i]);
+            print_string(" ");
+        }
+        print_string("\n");
     } else if (strcmp(argv[0], "clear") == 0) {
         shell_clear();
     } else if (strcmp(argv[0], "shutdown") == 0) {

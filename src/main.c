@@ -12,7 +12,7 @@ void __stack_chk_fail_local(void) {
     __stack_chk_fail();
 }
 
-int main() {
+int start_kernel() {
     // Setup shell
     print_string("Hello from Crei!\n");
     print_string("$ ");
