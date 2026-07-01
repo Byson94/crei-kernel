@@ -5,9 +5,11 @@
 #include "tarfs.h"
 #include "hardware.h"
 
-static const char* helps[6][2] = {
+static const char* helps[8][2] = {
     { "echo", "Echo something" },
     { "ls", "List everything in current directory" }, 
+    { "touch", "Create a new file" },
+    { "mkdir", "Create a new directory" },
     { "clear", "Clear Buffer" },
     { "shutdown", "Attempt to shutdown this device" },
     { "kmsg", "Send a message to the kernel" },
@@ -150,7 +152,24 @@ void handle_command(int argc, char** argv) {
             return;   
         }
 
-        if (strcmp(argv[1], "k22halt") == 0) {
+        if ((strcmp(argv[1], "scrollscrn") == 0)) {
+            if (argc >= 3) {
+                char* count_str = argv[2];
+                int count = atoi(count_str);
+                
+                for (int i = 0; i < count; i++) {
+                    scroll_screen();
+                    line_start_position = cursor_position;
+                }
+
+                return;
+            }
+
+            scroll_screen();
+        } 
+
+        // Hidden
+        else if (strcmp(argv[1], "k22halt") == 0) {
             print_string("Halting under user request...\n");
             print_string("You can press the physical power button to shutdown.\n");
             __asm__ __volatile__("cli; hlt");

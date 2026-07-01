@@ -87,3 +87,30 @@ void print_int(unsigned int value) {
     print_string(&buffer[i + 1]);
 }
 
+
+int atoi(const char* str) {
+    int result = 0;
+    int sign = 1;
+    size_t i = 0;
+
+    while (str[i] == ' ' || (str[i] >= '\t' && str[i] <= '\r')) {
+        i++;
+    }
+
+    if (str[i] == '-') {
+        sign = -1;
+        i++;
+    } else if (str[i] == '+') {
+        i++;
+    }
+
+    while (str[i] >= '0' && str[i] <= '9') {
+        int digit = str[i] - '0';
+        
+        result = (result * 10) + digit;
+        i++;
+    }
+
+    return sign * result;
+}
+
