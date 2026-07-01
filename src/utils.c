@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "io.h"
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -68,4 +69,21 @@ size_t split_whitespace_inplace(char *str, size_t max_words, char **out_words) {
     return word_count;
 }
 
+void print_int(unsigned int value) {
+    char buffer[11];
+    int i = 9;
+    buffer[10] = '\0';
+    
+    if (value == 0) {
+        print_string("0");
+        return;
+    }
+    
+    while (value > 0 && i >= 0) {
+        buffer[i] = (value % 10) + '0';
+        value /= 10;
+        i--;
+    }
+    print_string(&buffer[i + 1]);
+}
 

@@ -2,10 +2,12 @@
 #include "shell.h"
 #include "utils.h"
 #include "panic.h"
+#include "tarfs.h"
 #include "hardware.h"
 
-static const char* helps[5][2] = {
+static const char* helps[6][2] = {
     { "echo", "Echo something" },
+    { "ls", "List everything in current directory" }, 
     { "clear", "Clear Buffer" },
     { "shutdown", "Attempt to shutdown this device" },
     { "kmsg", "Send a message to the kernel" },
@@ -95,6 +97,30 @@ void handle_command(int argc, char** argv) {
             print_string(" ");
         }
         print_string("\n");
+    } else if (strcmp(argv[0], "ls") == 0) {
+        char** files = tarfs_list((char*)tarfs_root);
+
+        int i = 0;
+        while (files[i] != 0) {
+            print_string("- ");
+            print_string(files[i]);
+            print_string("\n");
+            i++;
+        }
+    } else if (strcmp(argv[0], "mkdir") == 0) {
+        if (argc < 2) {
+            print_string("Must pass a name to the directory.\n");
+            return;
+        }
+        char* name = argv[1];
+        tarfs_mkdir((char*)tarfs_root, TARFS_MAX_SIZE, name);
+    } else if (strcmp(argv[0], "touch") == 0) {
+        if (argc < 2) {
+            print_string("Must pass a name to the file.\n");
+            return;
+        }
+        char* name = argv[1];
+        tarfs_mkfile((char*)tarfs_root, TARFS_MAX_SIZE, name);
     } else if (strcmp(argv[0], "clear") == 0) {
         shell_clear();
     } else if (strcmp(argv[0], "shutdown") == 0) {

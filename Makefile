@@ -31,7 +31,8 @@ $(BUILD)/crei-kernel: $(BUILD)/boot.o $(OBJS)
 # Building
 iso: $(BUILD)/crei-kernel
 	@mkdir -p $(BUILD)/iso_root/boot/grub
-	cp $(BUILD)/crei-kernel build/iso_root/boot/
+	cp $(BUILD)/crei-kernel build/iso_root/boot/ 
+	cp embed/filesystem.tar $(BUILD)/iso_root/boot/filesystem.tar
 	cp embed/grub.cfg $(BUILD)/iso_root/boot/grub/grub.cfg 
 	cd build && grub-mkrescue -o crei.iso iso_root
 

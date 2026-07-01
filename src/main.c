@@ -1,5 +1,7 @@
 #include "io.h"
 #include "shell.h"
+#include "tarfs.h"
+#include "panic.h"
 
 __attribute__((noreturn)) void __stack_chk_fail(void) {
     print_string("KERNEL PANIC: Stack Smashing Detected!");
@@ -12,7 +14,14 @@ void __stack_chk_fail_local(void) {
     __stack_chk_fail();
 }
 
-int start_kernel() {
+int start_kernel(unsigned int mb_address) {
+    // Init fs
+    print_string("Initializing init_tarfs...\n");
+    int ret = init_tarfs((void*)mb_address);
+    if (ret != 0) {
+        PANIC("Failed to initialize init_tarfs.");
+    }
+
     // Setup shell
     print_string("Hello from Crei!\n");
     print_string("$ ");

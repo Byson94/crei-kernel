@@ -14,6 +14,12 @@ void outb(unsigned short port, unsigned char data) {
     __asm__ volatile("outb %%al, %%dx" : : "a"(data), "d"(port));
 }
 
+unsigned short inw(unsigned short port) {
+    unsigned short result;
+    __asm__ volatile("inw %%dx, %%ax" : "=a"(result) : "d"(port));
+    return result;
+}
+
 IBMPair global_ibm_array[] = {
     {0x02, "1"},  {0x03, "2"},  {0x04, "3"},  {0x05, "4"},
     {0x06, "5"},  {0x07, "6"},  {0x08, "7"},  {0x09, "8"},
