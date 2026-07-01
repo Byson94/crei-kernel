@@ -1,4 +1,5 @@
 #include "io.h"
+#include "shell.h"
 #include "hardware.h"
 
 unsigned int cursor_position = 0;
@@ -58,6 +59,10 @@ void print_string(const char *str) {
             video_memory[cursor_position * 2] = str[i];
             video_memory[cursor_position * 2 + 1] = 0x0F;
             cursor_position++;
+        }
+
+        if (cursor_position >= VGA_SCREEN_SIZE) {
+            scroll_screen(); 
         }
 
         i++;

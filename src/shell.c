@@ -168,10 +168,6 @@ void handle_command(int argc, char** argv) {
     }
 }
 
-#define VGA_COLS 80
-#define VGA_ROWS 25
-#define VGA_SCREEN_SIZE (VGA_COLS * VGA_ROWS)
-
 void scroll_screen() {
     volatile char *video_memory = (volatile char*) 0xB8000;
 
@@ -241,16 +237,12 @@ void run_shell() {
                         size_t count = split_whitespace_inplace(cmd, 81, argv);
                         handle_command(count, argv);
 
-                        if (cursor_position >= VGA_SCREEN_SIZE) {
+                        while (cursor_position >= VGA_SCREEN_SIZE) {
                             scroll_screen();
                         }
                 
                         // setep shell
                         print_string("$ ");
-
-                        if (cursor_position >= VGA_SCREEN_SIZE) {
-                            scroll_screen();
-                        }
 
                         line_start_position = cursor_position;
                     } 
