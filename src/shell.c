@@ -88,6 +88,17 @@ void shell_shutdown() {
     }
 }
 
+// == File System ==
+void list_files(char** files) {
+    int i = 0;
+    while (files[i] != 0) {
+        print_string("- ");
+        print_string(files[i]);
+        print_string("\n");
+        i++;
+    }
+}
+
 void handle_command(int argc, char** argv) {
     if (strcmp(argv[0], "help") == 0) {
         shell_help();
@@ -98,15 +109,23 @@ void handle_command(int argc, char** argv) {
         }
         print_string("\n");
     } else if (strcmp(argv[0], "ls") == 0) {
-        char** files = tarfs_list((char*)tarfs_root);
+        if (argc >= 2) {
+            char* dir_name = argv[1];
+            void* dir_addr = tarfs_find((char*)tarfs_root, dir_name);
 
-        int i = 0;
-        while (files[i] != 0) {
-            print_string("- ");
-            print_string(files[i]);
-            print_string("\n");
-            i++;
+            if (dir_addr == NULL) {
+                print_string("Directory with that name does not exist.\n");
+                return;
+            }
+
+            char** files = tarfs_list((char*)dir_addr);
+            list_files(files);
+
+            return;
         }
+
+        char** files = tarfs_list((char*)tarfs_root);
+        list_files(files);
     } else if (strcmp(argv[0], "mkdir") == 0) {
         if (argc < 2) {
             print_string("Must pass a name to the directory.\n");
@@ -149,6 +168,36 @@ void handle_command(int argc, char** argv) {
     }
 }
 
+#define VGA_COLS 80
+#define VGA_ROWS 25
+#define VGA_SCREEN_SIZE (VGA_COLS * VGA_ROWS)
+
+void scroll_screen() {
+    volatile char *video_memory = (volatile char*) 0xB8000;
+
+    int bytes_to_shift = (VGA_ROWS - 1) * VGA_COLS * 2;
+    for (int i = 0; i < bytes_to_shift; i++) {
+        __asm__ __volatile__("" : : : "memory");
+        video_memory[i] = video_memory[i + (VGA_COLS * 2)];
+    }
+
+    int last_row_start_index = (VGA_ROWS - 1) * VGA_COLS;
+    for (int i = 0; i < VGA_COLS; i++) {
+        __asm__ __volatile__("" : : : "memory");
+        video_memory[(last_row_start_index + i) * 2] = ' ';
+        video_memory[(last_row_start_index + i) * 2 + 1] = 0x07;
+    }
+
+    cursor_position -= VGA_COLS;
+    
+    if (line_start_position >= VGA_COLS) {
+        line_start_position -= VGA_COLS;
+    } else {
+        line_start_position = 0;
+    }
+    
+}
+
 void run_shell() {
     unsigned char status = inb(0x64);
 
@@ -163,6 +212,12 @@ void run_shell() {
                     int cursor_before_print = cursor_position;
 
                     print_string(string);
+
+                    if (cursor_position >= VGA_SCREEN_SIZE) {
+                        scroll_screen();
+                        cursor_before_print -= VGA_COLS; 
+                    }
+
                     volatile char *video_memory = (volatile char*) 0xB8000;
 
                     // handle newlines (enter)
@@ -185,9 +240,18 @@ void run_shell() {
                         char* argv[81];
                         size_t count = split_whitespace_inplace(cmd, 81, argv);
                         handle_command(count, argv);
+
+                        if (cursor_position >= VGA_SCREEN_SIZE) {
+                            scroll_screen();
+                        }
                 
                         // setep shell
                         print_string("$ ");
+
+                        if (cursor_position >= VGA_SCREEN_SIZE) {
+                            scroll_screen();
+                        }
+
                         line_start_position = cursor_position;
                     } 
 

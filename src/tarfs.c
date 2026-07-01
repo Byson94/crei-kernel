@@ -1,4 +1,5 @@
 #include "tarfs.h"
+#include "utils.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -195,4 +196,40 @@ void* tarfs_mkfile(char* tarfs_addr, size_t max_size, const char* name) {
     }
 
     return (void*)current_block;
+}
+
+static int tarfs_name_match(const char* tar_name, const char* search_name) {
+    size_t i = 0;
+    while (i < 100) {
+        if (search_name[i] == '\0') {
+            // Exact match
+            if (tar_name[i] == '\0') return 1;
+            // Match if the TAR entry is a directory version of our search (has a trailing slash)
+            if (tar_name[i] == '/' && tar_name[i + 1] == '\0') return 1;
+            return 0;
+        }
+        if (tar_name[i] != search_name[i]) {
+            return 0;
+        }
+        i++;
+    }
+    return 0;
+}
+
+void* tarfs_find(char* tarfs_addr, const char* name) {
+    char* current_block = tarfs_addr;
+
+    while (current_block[0] != '\0') {
+        
+        if (tarfs_name_match(current_block, name)) {
+            return (void*)current_block; 
+        }
+
+        unsigned int file_size = parse_octal_size(&current_block[124]);
+        unsigned int aligned_size = (file_size + 511) & ~511;
+        
+        current_block += 512 + aligned_size;
+    }
+
+    return NULL;
 }
